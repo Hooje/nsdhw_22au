@@ -30,13 +30,17 @@ int arrays_2d(py::array_t<double>& input, py::array_t<double>& target)
     int dataArraySize = rows * columns;
 
     vector<double> dataVec(ptr, ptr + dataArraySize);
+    //一維表示二維
     vector<double> targetVec(tptr, tptr + columns);
+    vector<double> tmp = copy_vector(dataVec,1,3);
+    //print_vec(dataVec);
+    //print_vec(tmp);
     //dataVec.insert(ptr, ptr + dataArraySize);
     //targetVec.insert(tptr, tptr + columns);
 
-   
 
-    DecisionTree dt(100);
+
+    //DecisionTree dt(100);
     //-------------------------------------------
     /*
     for (int i = 0; i < buf.shape[0]; i++)

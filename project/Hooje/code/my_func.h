@@ -6,6 +6,24 @@
 using namespace std;
 
 template <class T>
+void print_vec(vector<T> dataVec)
+{
+    for(int i = 0; i < int(dataVec.size()); i++)
+    {
+        cout<<dataVec[i]<<' ';
+    }
+}
+
+template <class T>
+vector<T> copy_vector(vector<T> ori_vector, int first_idx,int last_idx) //不包含 last_idx
+{
+    typename vector<T>::const_iterator first = ori_vector.begin() + first_idx;
+    typename vector<T>::const_iterator last = ori_vector.begin() + last_idx;
+    vector<T> newVec(first, last);
+    return newVec;
+}
+
+template <class T>
 set<T> convertToSet(vector<T> v)
 {
     set<T> s;
@@ -71,12 +89,13 @@ public:
     node* root = NULL;
     DecisionTree(int max_depth);
 
-    void fit();
-    void predict();
+    void fit(vector<double> xy);
+    void predict(vector<double> test, int rows, int columns);
     void predict_class();
     void split_two();
     void split();
     void end_to_leaf();
+    void get_split();
 };
 
 DecisionTree::DecisionTree(int max_depth)
@@ -84,29 +103,41 @@ DecisionTree::DecisionTree(int max_depth)
     max_depth = max_depth;
     cout<<"max_depth = "<<max_depth<<endl;
 }
-DecisionTree::fit()
+void DecisionTree::fit(vector<double> xy)
 {
-
+    //this->root = this->get_split(xy)
+    //this->split(this->root, 1)
 }
-DecisionTree::predict()
+void DecisionTree::predict(vector<double> test, int rows, int columns)
 {
-
+    vector<int> pt;
+    vector<double> tmp;
+    for(int i = 0; i < rows; i++)
+    {
+        tmp = copy_vector(test, i*columns, (i+1)*columns); //不包含 last_idx
+        
+    }
+    return;
 }
-DecisionTree::predict_class()
+void DecisionTree::predict_class()
 {
-
+    return;
 }
-DecisionTree::split_two()
+void DecisionTree::split_two()
 {
-
+    return;
 }
-DecisionTree::split()
+void DecisionTree::split()
 {
-
-}
-
-DecisionTree::end_to_leaf()
+    return;
+}   
+void DecisionTree::get_split()
 {
+    return;
+}   
 
+void DecisionTree::end_to_leaf()
+{
+    return;
 }
 
