@@ -26,21 +26,26 @@ int arrays_2d(py::array_t<double>& input, py::array_t<double>& target)
     int rows = buf.shape[0];
     int columns = buf.shape[1];
     
+    //cout<<rows<<columns<<endl;
 
     int dataArraySize = rows * columns;
 
     vector<double> dataVec(ptr, ptr + dataArraySize);
     //一維表示二維
-    vector<double> targetVec(tptr, tptr + columns);
-    vector<double> tmp = copy_vector(dataVec,1,3);
+    vector<double> targetVec(tptr, tptr + rows);
+    //vector<double> tmp = copy_vector(dataVec,1,3);
     //print_vec(dataVec);
     //print_vec(tmp);
     //dataVec.insert(ptr, ptr + dataArraySize);
     //targetVec.insert(tptr, tptr + columns);
 
-
-
-    //DecisionTree dt(100);
+    set<double> targetset = convertToSet(targetVec);
+    
+    int class_n = targetset.size();
+    //cout<<class_n<<endl;
+    //printSet(targetset);
+    DecisionTree dt(100, columns, class_n);
+    dt.fit(dataVec);
     //-------------------------------------------
     /*
     for (int i = 0; i < buf.shape[0]; i++)

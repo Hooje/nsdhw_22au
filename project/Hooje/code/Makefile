@@ -7,7 +7,7 @@ CFLAGS = -O3 -Wall -shared -std=c++11 -fPIC
 
 .PHONY: all, np, clean
 
-all: np test
+all: clean np test
 
 np : _np.cpp 
 	$(CC)  $(CFLAGS) $(INCLUDE) _np.cpp -o _np$(POSFIX) $(CONFIG)

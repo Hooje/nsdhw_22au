@@ -85,12 +85,12 @@ struct two_vec
 struct node
 {
     int leaf = 0; // if leaf then 1
-    int target = 0; // if leaf target = its class
+    double target = 0; // if leaf target = its class
     int idx = -1; // use idx feature to split
     double value = -1; // if sth's idx feature > value  go to right, <= go to left
     node *left = NULL;
     node *right = NULL;
-    two_vec* group = NULL:
+    two_vec* group = NULL;
 };
 
 
@@ -100,14 +100,14 @@ class DecisionTree
 public:
     int max_depth = 100, columns = 0, class_n = 0;
     node* root = NULL;
-    DecisionTree(int max_depth);
+    DecisionTree(int max_depth, int columns, int class_n);
 
     void fit(vector<double> xy);
-    vector<int> predict(vector<double> test, int rows, int columns);
+    vector<double> predict(vector<double> test, int rows, int columns);
     node* predict_class(node* t_node, vector<double> row);
-    two_vec* split_two(int idx, double value);
+    two_vec* split_two(int idx, double value, vector<double> xy);
     void split(node* t_node, int depth);
-    int end_to_leaf(vector<double> subxy);
+    double end_to_leaf(vector<double> subxy);
     node* get_split(vector<double> xy);
 };
 
@@ -120,19 +120,23 @@ DecisionTree::DecisionTree(int max_depth, int columns, int class_n)
 }
 void DecisionTree::fit(vector<double> xy)
 {
+    cout<<"fit"<<endl;
     this->root = this->get_split(xy);
     this->split(this->root, 1);
 }
-vector<int> DecisionTree::predict(vector<double> test, int rows, int columns)
+vector<double> DecisionTree::predict(vector<double> test, int rows, int columns)
 {
-    vector<int> pt;
+    vector<double> pt;
     vector<double> tmp;
-    int tmp_pt;
+    double tmp_pt;
+    node* class_node;
     for(int i = 0; i < rows; i++)
     {
         tmp = copy_vector(test, i*columns, (i+1)*columns); //不包含 last_idx
-        tmp_pt = this->predict_class(this->root, tmp)
-        pt.push_back(tmp_pt)
+        
+        class_node = this->predict_class(this->root, tmp);
+        tmp_pt = class_node->target;
+        pt.push_back(tmp_pt);
     }
     return pt;
 }
@@ -151,12 +155,17 @@ node* DecisionTree::predict_class(node* t_node, vector<double> row)
         return this->predict_class(t_node->right, row);
     }
 }
-two_vec* DecisionTree::split_two(int idx, double value)
+two_vec* DecisionTree::split_two(int idx, double value, vector<double> xy)
 {
+    cout<<"split two"<<endl;
     vector<double> left, right, row;
+    int rows = xy.size() / this->columns;
+    //cout<<rows<<endl;
+    
     for(int i = 0; i < rows; i++)
     {
-        row = copy_vector(test, i*columns, (i+1)*columns); //不包含 last_idx
+        //cout<<"split two "<<i<<"th loop"<<endl;
+        row = copy_vector(xy, i*columns, (i+1)*columns); //不包含 last_idx
         if(row[idx] < value)
         {
             left = vec_concat(left, row);
@@ -166,22 +175,25 @@ two_vec* DecisionTree::split_two(int idx, double value)
             right = vec_concat(right, row);
         }
     }
-    two_vec* group;
+    //cout<<"leave loop"<<endl;
+    two_vec* group = new two_vec();
+
     group->v1 = left;
     group->v2 = right;
+    //cout<<"wait return"<<endl;
     return group;
 }
 void DecisionTree::split(node* t_node, int depth)
 {
     two_vec* tmp;
     tmp = t_node->group;
-    if(tmp->v1 == NULL)
+    if(tmp->v1.size() == 0)
     {
         t_node->leaf = 1;
         t_node->target = this->end_to_leaf(tmp->v2);
         return;
     }
-    else if(tmp->v2 == NULL)
+    else if(tmp->v2.size() == 0)
     {
         t_node->leaf = 1;
         t_node->target = this->end_to_leaf(tmp->v1);
@@ -205,18 +217,22 @@ void DecisionTree::split(node* t_node, int depth)
 }   
 node* DecisionTree::get_split(vector<double> xy)
 {
+    cout<<"get split"<<endl;
     int rows = xy.size() / this->columns;
     int columns = this->columns;
-    two_vec* b_groups, tmp_groups;
-    int b_index;
-    double b_value, b_score, left_value, right_value;
+    two_vec* b_groups = NULL;
+    two_vec* tmp_groups;
+    int b_index = 0;
+    double b_value = 999, b_score = 999, left_value, right_value;
     vector<double> eachrow;
-    for(int f_idx; f_idx < this->columns; f_idx ++)
-    {
+    for(int f_idx = 0; f_idx < this->columns; f_idx ++)
+    {   
+        cout<<"b_score = "<<b_score<<endl;
         for(int i = 0; i < rows; i++)
         {
-            eachrow = copy_vector(test, i*columns, (i+1)*columns); //不包含 last_idx
-            tmp_groups = split_two(f_idx, eachrow[f_idx])
+
+            eachrow = copy_vector(xy, i*columns, (i+1)*columns); //不包含 last_idx
+            tmp_groups = split_two(f_idx, eachrow[f_idx], xy);
             if(tmp_groups->v1.size()==0)
             {
                 left_value = 0;
@@ -248,9 +264,16 @@ node* DecisionTree::get_split(vector<double> xy)
             int lenleft = tmp_groups->v1.size();
             int lenright = tmp_groups->v2.size();
             int lenall = lenleft + lenright;
-            double gini_value = left_value * (lenleft/lenall) + right_value * (lenright/lenall)
-            if(gini_value<= b_score)
-            {
+            double gini_value = left_value * (lenleft/lenall) + right_value * (lenright/lenall);
+            //int x;
+            //cout<<"gini = "<<gini_value<<endl;
+            //cin>>x;
+            if(gini_value < b_score)
+            {   
+                if(b_score < 100)
+                {
+                    cout<<'o'<<endl;
+                }
                 b_index = f_idx;
                 b_value = eachrow[f_idx];
                 b_score = gini_value;
@@ -260,15 +283,16 @@ node* DecisionTree::get_split(vector<double> xy)
             
         } 
     }
-    node* tmp_node;
+    node* tmp_node = new node();
     tmp_node->idx = b_index;
     tmp_node->group = b_groups;
     tmp_node->value = b_value;
     return tmp_node;
 }   
 
-int DecisionTree::end_to_leaf(vector<double> subxy)
+double DecisionTree::end_to_leaf(vector<double> subxy)
 {
+    cout<<"end to leaf"<<endl;
     int rows = subxy.size() / this->columns;
     vector<double> class_tmp(this->class_n, 0);
     for(int i = 0; i < rows; i++)
@@ -285,6 +309,6 @@ int DecisionTree::end_to_leaf(vector<double> subxy)
             tmp = i;
         }
     }
-    return tmp;
+    return double(tmp);
 }
 

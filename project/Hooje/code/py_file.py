@@ -14,7 +14,9 @@ def main():
     X_train, X_test, y_train, y_test = train_test_split(
         ori_data, ori_target, test_size=0.3, random_state=42)
     #print(ori_data)
-    arrays_2d(ori_data, ori_target)
+    #input(set(y_train))
+    #print(X_train.shape)
+    arrays_2d(X_train, y_train)
 
 if __name__=="__main__":
     main()
