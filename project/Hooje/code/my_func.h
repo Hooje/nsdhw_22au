@@ -5,6 +5,20 @@
 #include <set>
 using namespace std;
 
+double get_accuracy(vector<double> v1, vector<double> v2)
+{
+    double ans;
+    double cnt = 0;
+    for(int i = 0; i < int(v1.size()); i++)
+    {
+        if(v1[i] == v2[i])
+        {
+            cnt+=1;
+        }
+    }
+    ans = cnt / double(v1.size());
+    return ans;
+}
 template <class T>
 void print_vec(vector<T> dataVec)
 {
@@ -12,6 +26,7 @@ void print_vec(vector<T> dataVec)
     {
         cout<<dataVec[i]<<' ';
     }
+    cout<<endl;
 }
 
 template <class T>
@@ -120,7 +135,7 @@ DecisionTree::DecisionTree(int max_depth, int columns, int class_n)
 }
 void DecisionTree::fit(vector<double> xy)
 {
-    cout<<"fit"<<endl;
+    //cout<<"fit"<<endl;
     this->root = this->get_split(xy);
     this->split(this->root, 1);
 }
@@ -157,7 +172,7 @@ node* DecisionTree::predict_class(node* t_node, vector<double> row)
 }
 two_vec* DecisionTree::split_two(int idx, double value, vector<double> xy)
 {
-    cout<<"split two"<<endl;
+    //cout<<"split two"<<endl;
     vector<double> left, right, row;
     int rows = xy.size() / this->columns;
     //cout<<rows<<endl;
@@ -217,7 +232,7 @@ void DecisionTree::split(node* t_node, int depth)
 }   
 node* DecisionTree::get_split(vector<double> xy)
 {
-    cout<<"get split"<<endl;
+    //cout<<"get split"<<endl;
     int rows = xy.size() / this->columns;
     int columns = this->columns;
     two_vec* b_groups = NULL;
@@ -227,22 +242,28 @@ node* DecisionTree::get_split(vector<double> xy)
     vector<double> eachrow;
     for(int f_idx = 0; f_idx < this->columns; f_idx ++)
     {   
-        cout<<"b_score = "<<b_score<<endl;
+        //cout<<"b_score = "<<b_score<<endl;
         for(int i = 0; i < rows; i++)
         {
 
             eachrow = copy_vector(xy, i*columns, (i+1)*columns); //不包含 last_idx
             tmp_groups = split_two(f_idx, eachrow[f_idx], xy);
+            /*
+            cout<<tmp_groups->v1.size()<<endl;
+            cout<<tmp_groups->v2.size()<<endl;
+            cout<<"next"<<endl;
+            */
             if(tmp_groups->v1.size()==0)
             {
                 left_value = 0;
             }
             else
-            {
+            {   
                 vector<double> class_left;
-                for(int c_idx = 0; c_idx < rows; c_idx++)
+                int tmp_rows = tmp_groups->v1.size() / columns;
+                for(int c_idx = 0; c_idx < tmp_rows; c_idx++)
                 {
-                    double tmp_c = xy[c_idx*columns + columns -1];
+                    double tmp_c = tmp_groups->v1[c_idx*columns + columns -1];
                     class_left.push_back(tmp_c);
                 }
                 left_value = gini(class_left);
@@ -254,26 +275,24 @@ node* DecisionTree::get_split(vector<double> xy)
             else
             {
                 vector<double> class_right;
-                for(int c_idx = 0; c_idx < rows; c_idx++)
+                int tmp_rows = tmp_groups->v2.size() / columns;
+                for(int c_idx = 0; c_idx < tmp_rows; c_idx++)
                 {
-                    double tmp_c = xy[c_idx*columns + columns -1];
+                    double tmp_c = tmp_groups->v2[c_idx*columns + columns -1];
                     class_right.push_back(tmp_c);
                 }
                 right_value = gini(class_right);
             }
-            int lenleft = tmp_groups->v1.size();
-            int lenright = tmp_groups->v2.size();
-            int lenall = lenleft + lenright;
+            double lenleft = double(tmp_groups->v1.size());
+            double lenright = double(tmp_groups->v2.size());
+            double lenall = lenleft + lenright;
             double gini_value = left_value * (lenleft/lenall) + right_value * (lenright/lenall);
             //int x;
             //cout<<"gini = "<<gini_value<<endl;
             //cin>>x;
             if(gini_value < b_score)
             {   
-                if(b_score < 100)
-                {
-                    cout<<'o'<<endl;
-                }
+                
                 b_index = f_idx;
                 b_value = eachrow[f_idx];
                 b_score = gini_value;
@@ -292,7 +311,7 @@ node* DecisionTree::get_split(vector<double> xy)
 
 double DecisionTree::end_to_leaf(vector<double> subxy)
 {
-    cout<<"end to leaf"<<endl;
+    //cout<<"end to leaf"<<endl;
     int rows = subxy.size() / this->columns;
     vector<double> class_tmp(this->class_n, 0);
     for(int i = 0; i < rows; i++)

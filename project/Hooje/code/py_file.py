@@ -1,5 +1,5 @@
 import _np
-from _np import arrays_2d
+from _np import arrays_2d, dt_pred
 import numpy as np
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
@@ -17,6 +17,7 @@ def main():
     #input(set(y_train))
     #print(X_train.shape)
     arrays_2d(X_train, y_train)
+    dt_pred(X_test, y_test)
 
 if __name__=="__main__":
     main()

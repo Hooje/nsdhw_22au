@@ -12,8 +12,37 @@ namespace py = pybind11;
 using std::cout;
 using std::endl;
 
+//int x = 0;
+DecisionTree dt(0,0,0);
+void dt_pred(py::array_t<double>& input, py::array_t<double>& target)
+{    
+    py::buffer_info buf  = input.request();
+    py::buffer_info tbuf  = target.request();
+    if (buf.ndim != 2)
+    {
+        throw std::runtime_error("numpy.ndarray dims must be 2!");
+    }
+    double* ptr = (double*)buf.ptr;
+    double* tptr = (double*)tbuf.ptr; 
+    int rows = buf.shape[0];
+    int columns = buf.shape[1];
+    int dataArraySize = rows * columns;
+    vector<double> dataVec(ptr, ptr + dataArraySize);
+    vector<double> targetVec(tptr, tptr + rows);
+    vector<double> predVec;
+    predVec = dt.predict(dataVec, rows, columns);
+    print_vec(predVec);
+    print_vec(targetVec);
+    double acc;
+    acc = get_accuracy(predVec, targetVec);
+    cout<<acc<<endl;
+    //cout<<x<<endl;
+    //cout<<"test "<<dt.max_depth<<endl;
+    //cout<<"test "<<dt.class_n<<endl;
 
-int arrays_2d(py::array_t<double>& input, py::array_t<double>& target)
+}
+
+void arrays_2d(py::array_t<double>& input, py::array_t<double>& target)
 {
     py::buffer_info buf  = input.request();
     py::buffer_info tbuf  = target.request();
@@ -44,8 +73,11 @@ int arrays_2d(py::array_t<double>& input, py::array_t<double>& target)
     int class_n = targetset.size();
     //cout<<class_n<<endl;
     //printSet(targetset);
-    DecisionTree dt(100, columns, class_n);
+    DecisionTree dt2(100, columns, class_n);
+    dt = dt2;
     dt.fit(dataVec);
+    cout<<"test "<<dt.max_depth<<endl;
+    cout<<"test "<<dt.class_n<<endl;
     //-------------------------------------------
     /*
     for (int i = 0; i < buf.shape[0]; i++)
@@ -61,8 +93,8 @@ int arrays_2d(py::array_t<double>& input, py::array_t<double>& target)
     */
 
     //--------------------------------------------
-    
-    return 0;
+    //x = 100;
+    return ;
 }
 
 
@@ -70,4 +102,5 @@ int arrays_2d(py::array_t<double>& input, py::array_t<double>& target)
 PYBIND11_MODULE(_np, m) {
     m.doc() = "numpy example";
     m.def("arrays_2d", &arrays_2d, "arrays_2d");
+    m.def("dt_pred", &dt_pred, "dt_pred");
 }
