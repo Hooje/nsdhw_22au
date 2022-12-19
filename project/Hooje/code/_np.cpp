@@ -8,11 +8,15 @@
 #include <set>
 
 #include "my_func.h"
+#include "mycuda.h"
+
 namespace py = pybind11;
 using std::cout;
 using std::endl;
 
 //int x = 0;
+//int my_cuda(int , int);
+
 DecisionTree dt(0,0,0);
 void dt_pred(py::array_t<double>& input, py::array_t<double>& target)
 {    
@@ -44,6 +48,7 @@ void dt_pred(py::array_t<double>& input, py::array_t<double>& target)
 
 void arrays_2d(py::array_t<double>& input, py::array_t<double>& target)
 {
+    my_cuda(3,4);
     py::buffer_info buf  = input.request();
     py::buffer_info tbuf  = target.request();
     if (buf.ndim != 2)
@@ -76,8 +81,8 @@ void arrays_2d(py::array_t<double>& input, py::array_t<double>& target)
     DecisionTree dt2(100, columns, class_n);
     dt = dt2;
     dt.fit(dataVec);
-    cout<<"test "<<dt.max_depth<<endl;
-    cout<<"test "<<dt.class_n<<endl;
+    //cout<<"test "<<dt.max_depth<<endl;
+    //cout<<"test "<<dt.class_n<<endl;
     //-------------------------------------------
     /*
     for (int i = 0; i < buf.shape[0]; i++)

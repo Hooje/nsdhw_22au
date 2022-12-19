@@ -5,6 +5,7 @@
 #include <set>
 using namespace std;
 
+
 double get_accuracy(vector<double> v1, vector<double> v2)
 {
     double ans;
@@ -245,14 +246,11 @@ node* DecisionTree::get_split(vector<double> xy)
         //cout<<"b_score = "<<b_score<<endl;
         for(int i = 0; i < rows; i++)
         {
-
+            
+            
             eachrow = copy_vector(xy, i*columns, (i+1)*columns); //不包含 last_idx
             tmp_groups = split_two(f_idx, eachrow[f_idx], xy);
-            /*
-            cout<<tmp_groups->v1.size()<<endl;
-            cout<<tmp_groups->v2.size()<<endl;
-            cout<<"next"<<endl;
-            */
+
             if(tmp_groups->v1.size()==0)
             {
                 left_value = 0;
@@ -287,9 +285,6 @@ node* DecisionTree::get_split(vector<double> xy)
             double lenright = double(tmp_groups->v2.size());
             double lenall = lenleft + lenright;
             double gini_value = left_value * (lenleft/lenall) + right_value * (lenright/lenall);
-            //int x;
-            //cout<<"gini = "<<gini_value<<endl;
-            //cin>>x;
             if(gini_value < b_score)
             {   
                 
@@ -298,6 +293,7 @@ node* DecisionTree::get_split(vector<double> xy)
                 b_score = gini_value;
                 b_groups = tmp_groups;
             }       
+            
 
             
         } 
