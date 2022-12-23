@@ -1,1 +1,1 @@
-int my_cuda(int , int);
+int my_cuda();

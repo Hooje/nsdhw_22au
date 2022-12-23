@@ -6,7 +6,7 @@ __global__ void kernel(){
     printf("inside in kernel\n");
 }
 
-int my_cuda(int a, int b){
+int my_cuda(){
 
    kernel<<<1,10>>>();
    cudaDeviceSynchronize();

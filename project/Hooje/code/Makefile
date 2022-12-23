@@ -3,7 +3,7 @@ INCLUDE = `python3 -m pybind11 --includes`
 POSFIX = `python3-config --extension-suffix`
 CONFIG = `python3-config --includes`
 #CFLAGS = -O3 -shared -std=c++11 -fPIC -Wall  
-CFLAGS = -Wall -shared -std=c++11 -fPIC -lcutest -L.
+CFLAGS = -Wall -shared -std=c++11 -fPIC -L. -lcutest 
 
 
 .PHONY: all, cuda, np, clean

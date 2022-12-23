@@ -8,7 +8,7 @@
 #include <set>
 
 #include "my_func.h"
-#include "mycuda.h"
+//#include "mycuda.h"
 
 namespace py = pybind11;
 using std::cout;
@@ -35,11 +35,13 @@ void dt_pred(py::array_t<double>& input, py::array_t<double>& target)
     vector<double> targetVec(tptr, tptr + rows);
     vector<double> predVec;
     predVec = dt.predict(dataVec, rows, columns);
+    cout<<"predict value : ";
     print_vec(predVec);
+    cout<<"true value : ";
     print_vec(targetVec);
     double acc;
     acc = get_accuracy(predVec, targetVec);
-    cout<<acc<<endl;
+    cout<<"accuracy = "<<acc<<endl;
     //cout<<x<<endl;
     //cout<<"test "<<dt.max_depth<<endl;
     //cout<<"test "<<dt.class_n<<endl;
@@ -48,7 +50,7 @@ void dt_pred(py::array_t<double>& input, py::array_t<double>& target)
 
 void arrays_2d(py::array_t<double>& input, py::array_t<double>& target)
 {
-    my_cuda(3,4);
+    //my_cuda();//3,4);
     py::buffer_info buf  = input.request();
     py::buffer_info tbuf  = target.request();
     if (buf.ndim != 2)
@@ -108,4 +110,5 @@ PYBIND11_MODULE(_np, m) {
     m.doc() = "numpy example";
     m.def("arrays_2d", &arrays_2d, "arrays_2d");
     m.def("dt_pred", &dt_pred, "dt_pred");
+    //m.def("my_cuda", &my_cuda, "my_cuda");
 }
